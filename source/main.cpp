@@ -20,6 +20,7 @@ int main(int argc, char* argv[])
 #if defined(_WIN32) || (WIN64) //this code is used to make sure this window that uses
 							  //SDL runs on Windows properly
  cout << "Running on Windows :) "<<endl;
+ cout << "Added on Windows" << endl;
 
 #endif
 
