@@ -6,6 +6,11 @@
 
 #endif
 
+#if defined(_WIN32) || (_WIN64)
+#include <direct.h>
+#define getcwd _getcwd
+#endif
+
 #if defined(__APPLE__)
 
 #include "SDL2/SDL.h"
@@ -25,10 +30,22 @@ using namespace std;
 #include <iostream>
 int main(int argc, char* argv[])
 {
+SDL_Renderer* r1;
+SDL_Rect Background;
+
+Background.x = 200;
+Background.y = 200;
+Background.h = 500;
+Background.w = 500;
+
 #if defined(_WIN32) || (WIN64) //this code is used to make sure this window that uses
 							  //SDL runs on Windows properly
  cout << "Running on Windows :) "<<endl;
  cout << "Hopefully working on windows" <<endl;
+
+ string currentWorkingDirectory(getcwd(NULL, 0));
+
+ string image_dir = currentWorkingDirectory + "\\Resources\\images";
 
 #endif
 
@@ -41,18 +58,36 @@ cout << "Running on Apple :) " <<endl;
 
 
 SDL_Window *window;
-
+//initialize SDL
 SDL_Init(SDL_INIT_VIDEO);
+//Create the window
+window = SDL_CreateWindow("SDL Test Window",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,1024,768,SDL_WINDOW_OPENGL);
 
-window = SDL_CreateWindow("SDL Test Window",SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,1024,768,SDL_WINDOW_OPENGL);
+//create a renderer
+r1 = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
+//create a texture
+
+SDL_Texture * t1 = IMG_LoadTexture(r1, "placeholder.png");
+if (t1 == NULL)
+{
+	cout << "Error Loading background :(" << endl;
+
+}
 if(window == NULL)
 {
 	printf("\n Couldn't create window :( ",SDL_GetError());
 	return 1;
 }
+
+// clear buffer and draw agents and walls.
+SDL_RenderCopy(r1, t1, NULL, &Background);
+
+SDL_RenderPresent(r1);
+
 SDL_Delay(3000);
+
+SDL_RenderClear(r1);
 
 SDL_DestroyWindow(window);
 
