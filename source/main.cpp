@@ -8,12 +8,6 @@
 
 #include "SDL2/SDL.h"
 
-#include "SDL2_image/SDL_image.h"
-
-#include "SDL2_mixer/SDL_mixer.h"
-
-#include "SDL2_ttf/SDL_ttf.h"
-
 #endif
 
 using namespace std;
@@ -43,11 +37,7 @@ SDL_Window *window;
 SDL_Init(SDL_INIT_VIDEO);
 
 window = SDL_CreateWindow("SDL Test Window",SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,1024,768,SDL_WINDOW_OPENGL);
-
-//code for making the level appear
-SDL_Surface * background;
-background = IMG_Load("/images/placeholder.png");
+		SDL_WINDOWPOS_UNDEFINED,640,480,SDL_WINDOW_OPENGL);
 
 if(window == NULL)
 {
