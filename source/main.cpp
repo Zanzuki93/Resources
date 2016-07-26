@@ -45,7 +45,7 @@ Background.w = 500;
 
  string currentWorkingDirectory(getcwd(NULL, 0));
 
- string image_dir = currentWorkingDirectory + "\\Resources\\images";
+ string images_dir = currentWorkingDirectory + "\\Resources\\images";
 
 #endif
 
@@ -53,7 +53,9 @@ Background.w = 500;
 	  	  	  	  	  //SDL runs on Apple properly
 
 cout << "Running on Apple :) " <<endl;
+string currentWorkingDirectory(getcwd(NULL, 0));
 
+ string images_dir = currentWorkingDirectory + "/Resources/images/";
 #endif
 
 
@@ -66,9 +68,16 @@ window = SDL_CreateWindow("SDL Test Window",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPO
 //create a renderer
 r1 = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
+SDL_Surface *surface = IMG_Load((images_dir + "placeholder.png").c_str());
+
 //create a texture
 
 SDL_Texture * t1 = IMG_LoadTexture(r1, "placeholder.png");
+
+//Creates a texture using the surface
+t1 = SDL_CreateTextureFromSurface(r1,surface);
+
+SDL_FreeSurface(surface);
 if (t1 == NULL)
 {
 	cout << "Error Loading background :(" << endl;
