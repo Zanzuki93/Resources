@@ -59,15 +59,15 @@ SDL_Window *window;
 //initialize SDL
 SDL_Init(SDL_INIT_VIDEO);
 //Create the window
-window = SDL_CreateWindow("SDL Test Window",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,1024,768,SDL_WINDOW_OPENGL);
+window = SDL_CreateWindow("DonQuixote's Last Ride",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,1024,768,SDL_WINDOW_OPENGL);
 
 //create a renderer
 r1 = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 //create the player texture
 SDL_Rect Player;
-Player.x = 500;
-Player.y = 400;
+Player.x = 750;
+Player.y = 620;
 Player.h = 50;
 Player.w = 10;
 
@@ -83,7 +83,7 @@ SDL_Rect Background;
 SDL_Texture * t1 = IMG_LoadTexture(r1, (images_dir+"LevelDesign2D.png").c_str());
 
 Background.x = 0;
-Background.y = -768;
+Background.y = -1468;
 int w,h;
 SDL_QueryTexture(t1,NULL,NULL,&w,&h);
 Background.h = h;
@@ -93,45 +93,71 @@ Background.w = w;
 //Right Wall
 SDL_Rect Wall;
 Wall.x = 1220;
-Wall.y = 80;
+Wall.y = -620;
 Wall.w = 30;
 Wall.h = 1300;
 SDL_Texture * w1 = IMG_LoadTexture(r1, (images_dir+"WallTexturePlaceholder.png").c_str());
 //Left Wall 
 SDL_Rect Wall2;
 Wall2.x = 0;
-Wall2.y = -570;
+Wall2.y = -1270;
 Wall2.w = 10;
 Wall2.h = 1970;
 SDL_Texture * w2 = IMG_LoadTexture(r1, (images_dir+"WallTexturePlaceholder.png").c_str());
 //Roof
 SDL_Rect Wall3;
 Wall3.x = 0;
-Wall3.y = -570;
+Wall3.y = -1270;
 Wall3.w = 1650;
 Wall3.h = 30;
 SDL_Texture * w3 = IMG_LoadTexture(r1, (images_dir+"WallTexturePlaceholder.png").c_str());
 //Floor
+SDL_Rect Wall4;
+Wall4.x = 0;
+Wall4.y = 670;
+Wall4.w = 1650;
+Wall4.h = 30;
+SDL_Texture * w4 = IMG_LoadTexture(r1, (images_dir + "WallTexturePlaceholder.png").c_str());
+//Right Wall
 SDL_Rect Wall5;
-Wall5.x = 0;
-Wall5.y = 1370;
-Wall5.w = 1650;
-Wall5.h = 30;
+Wall5.x = 460;
+Wall5.y = -790;
+Wall5.w = 30;
+Wall5.h = 1475;
 SDL_Texture * w5 = IMG_LoadTexture(r1, (images_dir + "WallTexturePlaceholder.png").c_str());
 //Right Wall
 SDL_Rect Wall6;
-Wall6.x = 460;
-Wall6.y = -90;
-Wall6.w = 30;
-Wall6.h = 1475;
+Wall6.x = 1650;
+Wall6.y = -1270;
+Wall6.w = 10;
+Wall6.h = 1970;
 SDL_Texture * w6 = IMG_LoadTexture(r1, (images_dir + "WallTexturePlaceholder.png").c_str());
-//Right Wall 
+//Ceiling For Rooms
 SDL_Rect Wall7;
-Wall7.x = 1650;
-Wall7.y = -570;
-Wall7.w = 10;
-Wall7.h = 1970;
+Wall7.x = 0;
+Wall7.y = -790;
+Wall7.w = 40;
+Wall7.h = 30;
 SDL_Texture * w7 = IMG_LoadTexture(r1, (images_dir + "WallTexturePlaceholder.png").c_str());
+SDL_Rect Wall8;
+Wall8.x = 150;
+Wall8.y = -790;
+Wall8.w = 325;
+Wall8.h = 20;
+SDL_Texture * w8 = IMG_LoadTexture(r1, (images_dir + "WallTexturePlaceholder.png").c_str());
+SDL_Rect Wall9;
+Wall9.x = 650;
+Wall9.y = -790;
+Wall9.w = 1000;
+Wall9.h = 20;
+SDL_Texture * w9 = IMG_LoadTexture(r1, (images_dir + "WallTexturePlaceholder.png").c_str());
+SDL_Rect Wall10;
+Wall10.x = 990;
+Wall10.y = -620;
+Wall10.w = 500;
+Wall10.h = 20;
+SDL_Texture * w10 = IMG_LoadTexture(r1, (images_dir + "WallTexturePlaceholder.png").c_str());
+
 
 
 
@@ -219,9 +245,13 @@ while(inGame)
 			Wall.x -= PlayerVelX;
 			Wall2.x -= PlayerVelX;
 			Wall3.x -= PlayerVelX;
+			Wall4.x -= PlayerVelX;
 			Wall5.x -= PlayerVelX;
 			Wall6.x -= PlayerVelX;
 			Wall7.x -= PlayerVelX;
+			Wall8.x -= PlayerVelX;
+			Wall9.x -= PlayerVelX;
+			Wall10.x -= PlayerVelX;
 		}
 	if(Player.x < 0 + (Player.w * 2))
 			{
@@ -231,13 +261,20 @@ while(inGame)
 				Wall.x -= PlayerVelX;
 				Wall2.x -= PlayerVelX;
 				Wall3.x -= PlayerVelX;
+				Wall4.x -= PlayerVelX;
 				Wall5.x -= PlayerVelX;
 				Wall6.x -= PlayerVelX;
 				Wall7.x -= PlayerVelX;
+				Wall8.x -= PlayerVelX;
+				Wall9.x -= PlayerVelX;
+				Wall10.x -= PlayerVelX;
 			}
 	//Checking For collision with walls and the player Left and Right
 	if (SDL_HasIntersection(&Player, &Wall) || SDL_HasIntersection(&Player, &Wall2) ||
-		SDL_HasIntersection(&Player, &Wall3) /*|| SDL_HasIntersection(&Player, &Wall4)*/)
+		SDL_HasIntersection(&Player, &Wall3) || SDL_HasIntersection(&Player, &Wall4)||
+		SDL_HasIntersection(&Player, &Wall5) ||SDL_HasIntersection(&Player, &Wall6)||
+		SDL_HasIntersection(&Player, &Wall7)||SDL_HasIntersection(&Player, &Wall8)||
+		SDL_HasIntersection(&Player, &Wall9)||SDL_HasIntersection(&Player, &Wall10))
 	{
 		Player.x -= PlayerVelX;
 	}
@@ -250,9 +287,13 @@ while(inGame)
 				Wall.y -= PlayerVelY;
 				Wall2.y -= PlayerVelY;
 				Wall3.y -= PlayerVelY;
+				Wall4.y -= PlayerVelY;
 				Wall5.y -= PlayerVelY;
 				Wall6.y -= PlayerVelY;
 				Wall7.y -= PlayerVelY;
+				Wall8.y -= PlayerVelY;
+				Wall9.y -= PlayerVelY;
+				Wall10.y -= PlayerVelY;
 			}
 
 			if(Player.y > 768 - (Player.h * 2))
@@ -263,15 +304,22 @@ while(inGame)
 				Wall.y -= PlayerVelY;
 				Wall2.y -= PlayerVelY;
 				Wall3.y -= PlayerVelY;
+				Wall4.y -= PlayerVelY;
 				Wall5.y -= PlayerVelY;
 				Wall6.y -= PlayerVelY;
 				Wall7.y -= PlayerVelY;
+				Wall8.y -= PlayerVelY;
+				Wall9.y -= PlayerVelY;
+				Wall10.y -= PlayerVelY;
 			}
 		
 
 	//Checking For collision with walls Up and Down
 			if (SDL_HasIntersection(&Player, &Wall) || SDL_HasIntersection(&Player, &Wall2) ||
-				SDL_HasIntersection(&Player, &Wall3) /*|| SDL_HasIntersection(&Player, &Wall4)*/)
+				SDL_HasIntersection(&Player, &Wall3)|| SDL_HasIntersection(&Player, &Wall4)||
+				SDL_HasIntersection(&Player,&Wall5) || SDL_HasIntersection(&Player, &Wall6)||
+				SDL_HasIntersection(&Player, &Wall7)||SDL_HasIntersection(&Player, &Wall8)||
+				SDL_HasIntersection(&Player, &Wall9)||SDL_HasIntersection(&Player, &Wall10))
 			{
 				Player.y -= PlayerVelY;
 			}
@@ -292,12 +340,19 @@ SDL_RenderCopy(r1,w2,NULL,&Wall2);
 
 SDL_RenderCopy(r1,w3,NULL,&Wall3);
 
+SDL_RenderCopy(r1, w4, NULL, &Wall4);
+
 SDL_RenderCopy(r1, w5, NULL, &Wall5);
 
 SDL_RenderCopy(r1, w6, NULL, &Wall6);
 
 SDL_RenderCopy(r1, w7, NULL, &Wall7);
 
+SDL_RenderCopy(r1, w8, NULL, &Wall8);
+
+SDL_RenderCopy(r1, w9, NULL, &Wall9);
+
+SDL_RenderCopy(r1, w10, NULL, &Wall10);
 
 SDL_RenderPresent(r1);
 //SDL Drawing Process End//
