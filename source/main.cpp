@@ -63,7 +63,7 @@ SDL_Window *window;
 //initialize SDL
 SDL_Init(SDL_INIT_VIDEO);
 //Create the window
-window = SDL_CreateWindow("SDL Test Window",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,1024,768,SDL_WINDOW_OPENGL);
+window = SDL_CreateWindow("DonQuixote's Last Ride",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,1024,768,SDL_WINDOW_OPENGL);
 
 //create a renderer
 r1 = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -105,7 +105,7 @@ SDL_Rect Wall2;
 Wall2.x = 0;
 Wall2.y = -1270;
 Wall2.w = 10;
-Wall2.h = 1970;
+Wall2.h = 2380;
 SDL_Texture * w2 = IMG_LoadTexture(r1, (images_dir + "WallTexturePlaceholder.png").c_str());
 //Roof
 SDL_Rect Wall3;
@@ -117,7 +117,7 @@ SDL_Texture * w3 = IMG_LoadTexture(r1, (images_dir + "WallTexturePlaceholder.png
 //Floor
 SDL_Rect Wall4;
 Wall4.x = 0;
-Wall4.y = 670;
+Wall4.y = 1080;
 Wall4.w = 1650;
 Wall4.h = 30;
 SDL_Texture * w4 = IMG_LoadTexture(r1, (images_dir + "WallTexturePlaceholder.png").c_str());
@@ -133,7 +133,7 @@ SDL_Rect Wall6;
 Wall6.x = 1650;
 Wall6.y = -1270;
 Wall6.w = 10;
-Wall6.h = 1970;
+Wall6.h = 2380;
 SDL_Texture * w6 = IMG_LoadTexture(r1, (images_dir + "WallTexturePlaceholder.png").c_str());
 //Ceiling For Rooms
 SDL_Rect Wall7;
@@ -160,7 +160,19 @@ Wall10.y = -620;
 Wall10.w = 500;
 Wall10.h = 20;
 SDL_Texture * w10 = IMG_LoadTexture(r1, (images_dir + "WallTexturePlaceholder.png").c_str());
-
+//More Floor Walls
+SDL_Rect Wall11;
+Wall11.x = 0;
+Wall11.y = 670;
+Wall11.w = 700;
+Wall11.h = 30;
+SDL_Texture *w11 = IMG_LoadTexture(r1,(images_dir + "WallTexturePlaceholder.png").c_str());
+SDL_Rect Wall12;
+Wall12.x = 785;
+Wall12.y = 670;
+Wall12.w = 875;
+Wall12.h = 30;
+SDL_Texture *w12 = IMG_LoadTexture(r1,(images_dir + "WallTexturePlaceholder.png").c_str());
 //Creating a pickup
 SDL_Rect healthPickUp;
 healthPickUp.x = 700;
@@ -266,9 +278,19 @@ Enemy.y = 620;
 Enemy.w = 20;
 Enemy.h = 30;
 SDL_Texture * EnemyTexture = IMG_LoadTexture(r1, (images_dir + "placeholder.png").c_str());
-
-
-
+//Creating a Turret Enemy
+SDL_Rect Turret;
+Turret.x = 20;
+Turret.y = -885;
+Turret.w = 50;
+Turret.h = 100;
+SDL_Texture * TurretTexture = IMG_LoadTexture(r1,(images_dir +"KillerPlantRight.png").c_str());
+SDL_Rect EnemyBullet;
+EnemyBullet.x = Turret.x+50;
+EnemyBullet.y = Turret.y;
+EnemyBullet.w = 20;
+EnemyBullet.h = 30;
+SDL_Texture * EBulletTexture = IMG_LoadTexture(r1,(images_dir + "EnemyBulletTextureRight.png").c_str());
 //Error Messages For Texture File Paths
 if (t1 == NULL)
 {
@@ -364,9 +386,13 @@ while(inGame)
 			Wall8.x -= PlayerVelX;
 			Wall9.x -= PlayerVelX;
 			Wall10.x -= PlayerVelX;
+			Wall11.x -=PlayerVelX;
+			Wall12.x -=PlayerVelX;
 			healthPickUp.x -= PlayerVelX;
 			ammoPickUp.x -= PlayerVelX;
 			Enemy.x -= PlayerVelX;
+			Turret.x -=PlayerVelX;
+			EnemyBullet.x -= PlayerVelX;
 		}
 	if(Player.x < 0 + (Player.w * 2))
 			{
@@ -382,17 +408,22 @@ while(inGame)
 				Wall7.x -= PlayerVelX;
 				Wall8.x -= PlayerVelX;
 				Wall9.x -= PlayerVelX;
-				Wall10.x -= PlayerVelX;
+				Wall10.x -=PlayerVelX;
+				Wall11.x -=PlayerVelX;
+				Wall12.x -=PlayerVelX;
 				healthPickUp.x -= PlayerVelX;
 				ammoPickUp.x -= PlayerVelX;
 				Enemy.x -= PlayerVelX;
+				Turret.x -=PlayerVelX;
+				EnemyBullet.x -= PlayerVelX;
 			}
 	//Checking For collision with walls and the player Left and Right
 	if (SDL_HasIntersection(&Player, &Wall) || SDL_HasIntersection(&Player, &Wall2) ||
 		SDL_HasIntersection(&Player, &Wall3) || SDL_HasIntersection(&Player, &Wall4)||
 		SDL_HasIntersection(&Player, &Wall5) ||SDL_HasIntersection(&Player, &Wall6)||
 		SDL_HasIntersection(&Player, &Wall7)||SDL_HasIntersection(&Player, &Wall8)||
-		SDL_HasIntersection(&Player, &Wall9)||SDL_HasIntersection(&Player, &Wall10))
+		SDL_HasIntersection(&Player, &Wall9)||SDL_HasIntersection(&Player, &Wall10)||
+		SDL_HasIntersection(&Player,&Wall11)||SDL_HasIntersection(&Player,&Wall12))
 	{
 		Player.x -= PlayerVelX;
 	}
@@ -453,7 +484,13 @@ while(inGame)
 		ammoCount = 0;
 		ManaBarFront.w = 0;
 	}*/
-
+	//Enemy Bullet Collsion
+	if(SDL_HasIntersection(&Player,&EnemyBullet))
+	{
+		Player.x -= PlayerVelX;
+		HealthBarFront.w -= 20;
+		playerHealth -= 10;
+	}
 	//Adjusting the screen Vertically
 	if (Player.y < 0 + (Player.h * 2))
 	{
@@ -470,9 +507,13 @@ while(inGame)
 		Wall8.y -= PlayerVelY;
 		Wall9.y -= PlayerVelY;
 		Wall10.y -= PlayerVelY;
+		Wall11.y -=PlayerVelY;
+		Wall12.y -=PlayerVelY;
 		healthPickUp.y -= PlayerVelY;
 		ammoPickUp.y -= PlayerVelY;
 		Enemy.y -= PlayerVelY;
+		Turret.y -=PlayerVelY;
+		EnemyBullet.y -= PlayerVelY;
 	}
 
 	if(Player.y > 768 - (Player.h * 2))
@@ -490,9 +531,13 @@ while(inGame)
 		Wall8.y -= PlayerVelY;
 		Wall9.y -= PlayerVelY;
 		Wall10.y -= PlayerVelY;
+		Wall11.y -=PlayerVelY;
+		Wall12.y -=PlayerVelY;
 		healthPickUp.y -= PlayerVelY;
 		ammoPickUp.y -= PlayerVelY;
 		Enemy.y -= PlayerVelY;
+		Turret.y -=PlayerVelY;
+		EnemyBullet.y -= PlayerVelY;
 	}
 
 
@@ -501,7 +546,8 @@ while(inGame)
 		SDL_HasIntersection(&Player, &Wall3)|| SDL_HasIntersection(&Player, &Wall4)||
 		SDL_HasIntersection(&Player,&Wall5) || SDL_HasIntersection(&Player, &Wall6)||
 		SDL_HasIntersection(&Player, &Wall7)||SDL_HasIntersection(&Player, &Wall8)||
-		SDL_HasIntersection(&Player, &Wall9)||SDL_HasIntersection(&Player, &Wall10))
+		SDL_HasIntersection(&Player, &Wall9)||SDL_HasIntersection(&Player, &Wall10)||
+		SDL_HasIntersection(&Player,&Wall11)||SDL_HasIntersection(&Player,&Wall12))
 	{
 		Player.y -= PlayerVelY;
 	}
@@ -548,6 +594,13 @@ while(inGame)
 		ManaBarFront.w += 20;
 		ammoCount += 1;
 	}*/
+	//Enemy Bullet Collision
+	if(SDL_HasIntersection(&Player,&EnemyBullet))
+	{
+		Player.y -= PlayerVelY;
+		HealthBarFront.w -= 20;
+		playerHealth -= 10;
+	}
 	//Update Player End//
 
 //SDL Drawing Process//
@@ -572,6 +625,8 @@ SDL_RenderCopy(r1,t2,NULL,&Player);
 //SDL_RenderCopy(r1, ManaPot, NULL, &ManaPotion);
 ////Rendering the enemy texture
 //SDL_RenderCopy(r1, EnemyTexture, NULL, &Enemy);
+SDL_RenderCopy(r1,TurretTexture,NULL,&Turret);
+SDL_RenderCopy(r1,EBulletTexture,NULL,&EnemyBullet);
 //Rendering the Keys in the level
 /*if (hasPinkKey != true)
 {
@@ -619,6 +674,10 @@ SDL_RenderCopy(r1, w8, NULL, &Wall8);
 SDL_RenderCopy(r1, w9, NULL, &Wall9);
 
 SDL_RenderCopy(r1, w10, NULL, &Wall10);
+
+SDL_RenderCopy(r1, w11, NULL, &Wall11);
+
+SDL_RenderCopy(r1, w12, NULL, &Wall12);
 
 SDL_RenderPresent(r1);
 //SDL Drawing Process End//
