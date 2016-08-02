@@ -30,6 +30,48 @@ using namespace std;
 
 #include <stdio.h>
 #include <iostream>
+#include <vector>
+#include <string>
+class EnemyBullet
+{
+public:
+	bool isActive;
+	//Creating a Enemy Bullet Stack
+	SDL_Rect EnemBullet;
+	SDL_Texture * EBulletTexture;
+	int BulletSpeed;
+	int BulletDir;
+	string filePath;
+	EnemyBullet(string testPath, SDL_Renderer * r1)
+	{
+		filePath = testPath;
+		EBulletTexture = IMG_LoadTexture(r1,(filePath).c_str());
+		cout << filePath <<endl;
+		if(EBulletTexture == NULL)
+		{
+			cout << "Error Loading Bullet Texture" <<endl;
+		}
+		EnemBullet.x = 100;
+		EnemBullet.y = 100;
+		EnemBullet.w = 30;
+		EnemBullet.h = 50;
+		BulletSpeed = 3;
+		BulletDir = 0;
+	}
+	void DrawBullet(SDL_Renderer * r1)
+	{
+		SDL_RenderCopy(r1,EBulletTexture, NULL,&EnemBullet);
+	}
+
+	void Update()
+	{
+		if(isActive == true)
+		{
+			EnemBullet.x += BulletSpeed;
+		}
+	}
+};
+
 int main(int argc, char* argv[])
 {
 #if defined(_WIN32) || (WIN64) //this code is used to make sure this window that uses
@@ -47,16 +89,30 @@ int main(int argc, char* argv[])
 	  	  	  	  	  //SDL runs on Apple properly
 
 cout << "Running on Apple :) " <<endl;
+
+
 string currentWorkingDirectory(getcwd(NULL, 0));
 
  string images_dir = currentWorkingDirectory + "/Resources/images/";
 #endif
+
+
 
  SDL_Renderer* r1;
  int playerHealth = 100;
  int ammoCount = 10;
  bool hasBlackKey = false, hasPinkKey = false, hasPurpleKey = false;
  bool inGame = true;
+
+
+
+
+
+/* vector <EnemyBullet> BulletList[10];
+BulletList[0].push_back(tempBullet);*/
+
+
+
  SDL_Event event;
 
 SDL_Window *window;
@@ -67,7 +123,7 @@ window = SDL_CreateWindow("DonQuixote's Last Ride",SDL_WINDOWPOS_UNDEFINED,SDL_W
 
 //create a renderer
 r1 = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
+EnemyBullet tempBullet = EnemyBullet((images_dir + "EnemyBulletTextureRight.png").c_str(),r1);
 //create the player texture
 SDL_Rect Player;
 Player.x = 750;
@@ -285,12 +341,14 @@ Turret.y = -885;
 Turret.w = 50;
 Turret.h = 100;
 SDL_Texture * TurretTexture = IMG_LoadTexture(r1,(images_dir +"KillerPlantRight.png").c_str());
-SDL_Rect EnemyBullet;
-EnemyBullet.x = Turret.x+50;
-EnemyBullet.y = Turret.y;
-EnemyBullet.w = 20;
-EnemyBullet.h = 30;
-SDL_Texture * EBulletTexture = IMG_LoadTexture(r1,(images_dir + "EnemyBulletTextureRight.png").c_str());
+//Creating Detection Box for the player
+SDL_Rect TurretVision;
+TurretVision.x = 40;
+TurretVision.y = -885;
+TurretVision.w = 400;
+TurretVision.h = 50;
+SDL_Texture * HitBox = IMG_LoadTexture(r1,(images_dir + "placeholder.png").c_str());
+SDL_Rect EBullet;
 //Error Messages For Texture File Paths
 if (t1 == NULL)
 {
@@ -339,10 +397,10 @@ while(inGame)
 				 case SDLK_d:
 				 PlayerVelX += Player_Vel;
 				 break;
-				 /*case SDLK_p:
+				 case SDLK_p:
 				 ManaBarFront.w -= 20;
 				 ammoCount -= 1;
-				 break;*/
+				 break;
 			  }
 		  }
 		  else if(event.type == SDL_KEYUP && event.key.repeat == 0)
@@ -364,8 +422,9 @@ while(inGame)
 			}
 		 }
 	  }
-	}
+
 	//Input End//
+
 
 	//Update Player//
 	//Adjusting the screen Horizontally
@@ -390,9 +449,12 @@ while(inGame)
 			Wall12.x -=PlayerVelX;
 			healthPickUp.x -= PlayerVelX;
 			ammoPickUp.x -= PlayerVelX;
+			PinkKey.x -= PlayerVelX;
+			PurpleKey.x -= PlayerVelX;
+			BlackKey.x -= PlayerVelX;
 			Enemy.x -= PlayerVelX;
 			Turret.x -=PlayerVelX;
-			EnemyBullet.x -= PlayerVelX;
+			TurretVision.x -=PlayerVelX;
 		}
 	if(Player.x < 0 + (Player.w * 2))
 			{
@@ -413,9 +475,12 @@ while(inGame)
 				Wall12.x -=PlayerVelX;
 				healthPickUp.x -= PlayerVelX;
 				ammoPickUp.x -= PlayerVelX;
+				PinkKey.x -= PlayerVelX;
+				PurpleKey.x -= PlayerVelX;
+				BlackKey.x -= PlayerVelX;
 				Enemy.x -= PlayerVelX;
 				Turret.x -=PlayerVelX;
-				EnemyBullet.x -= PlayerVelX;
+				TurretVision.x -=PlayerVelX;
 			}
 	//Checking For collision with walls and the player Left and Right
 	if (SDL_HasIntersection(&Player, &Wall) || SDL_HasIntersection(&Player, &Wall2) ||
@@ -428,14 +493,21 @@ while(inGame)
 		Player.x -= PlayerVelX;
 	}
 	//Enemy Collision
-	/*if (SDL_HasIntersection(&Player, &Enemy))
+	if (SDL_HasIntersection(&Player, &Enemy))
 	{
 		Player.x -= PlayerVelX;
 		HealthBarFront.w -= 10;
 		playerHealth -= 5;
-	}*/
+	}
+
+	if(SDL_HasIntersection(&Player,&TurretVision))
+	{
+		cout <<"Turret Found The Player >:) "<<endl;
+		/*BulletList[0].isActive = true;
+		cout << "BulletList[0].isActive" << " = " <<BulletList[0].isActive;*/
+	}
 	//Key Collision
-	/*
+
 	if (SDL_HasIntersection(&Player, &PinkKey))
 	{
 		Player.x -= PlayerVelX;
@@ -483,13 +555,6 @@ while(inGame)
 	{
 		ammoCount = 0;
 		ManaBarFront.w = 0;
-	}*/
-	//Enemy Bullet Collsion
-	if(SDL_HasIntersection(&Player,&EnemyBullet))
-	{
-		Player.x -= PlayerVelX;
-		HealthBarFront.w -= 20;
-		playerHealth -= 10;
 	}
 	//Adjusting the screen Vertically
 	if (Player.y < 0 + (Player.h * 2))
@@ -511,9 +576,12 @@ while(inGame)
 		Wall12.y -=PlayerVelY;
 		healthPickUp.y -= PlayerVelY;
 		ammoPickUp.y -= PlayerVelY;
+		PinkKey.y -= PlayerVelY;
+		PurpleKey.y -= PlayerVelY;
+		BlackKey.y -= PlayerVelY;
 		Enemy.y -= PlayerVelY;
 		Turret.y -=PlayerVelY;
-		EnemyBullet.y -= PlayerVelY;
+		TurretVision.y -=PlayerVelY;
 	}
 
 	if(Player.y > 768 - (Player.h * 2))
@@ -535,9 +603,12 @@ while(inGame)
 		Wall12.y -=PlayerVelY;
 		healthPickUp.y -= PlayerVelY;
 		ammoPickUp.y -= PlayerVelY;
+		PinkKey.y -= PlayerVelY;
+		PurpleKey.y -= PlayerVelY;
+		BlackKey.y -= PlayerVelY;
 		Enemy.y -= PlayerVelY;
 		Turret.y -=PlayerVelY;
-		EnemyBullet.y -= PlayerVelY;
+		TurretVision.y -=PlayerVelY;
 	}
 
 
@@ -552,14 +623,14 @@ while(inGame)
 		Player.y -= PlayerVelY;
 	}
 	//Enemy Collision
-	/*if (SDL_HasIntersection(&Player, &Enemy))
+	if (SDL_HasIntersection(&Player, &Enemy))
 	{
 		Player.y -= PlayerVelY;
 		HealthBarFront.w -= 10;
 		playerHealth -= 5;
-	}*/
+	}
 	//Key Collision
-	/*if (SDL_HasIntersection(&Player, &BlackKey) && hasBlackKey != true)
+	if (SDL_HasIntersection(&Player, &BlackKey) && hasBlackKey != true)
 	{
 		Player.y -= PlayerVelY;
 		BlackKey.x = 0;
@@ -593,13 +664,6 @@ while(inGame)
 		Player.y -= PlayerVelY;
 		ManaBarFront.w += 20;
 		ammoCount += 1;
-	}*/
-	//Enemy Bullet Collision
-	if(SDL_HasIntersection(&Player,&EnemyBullet))
-	{
-		Player.y -= PlayerVelY;
-		HealthBarFront.w -= 20;
-		playerHealth -= 10;
 	}
 	//Update Player End//
 
@@ -611,48 +675,50 @@ SDL_RenderCopy(r1, t1, NULL, &Background);
 //render what is presently in the buffer
 SDL_RenderCopy(r1,t2,NULL,&Player);
 
-//SDL_RenderCopy(r1, HealthPkUp1, NULL, &healthPickUp);
+SDL_RenderCopy(r1, HealthPkUp1, NULL, &healthPickUp);
 //Rendering the Ammo Pickup
-//SDL_RenderCopy(r1, AmmoPkUp1, NULL, &ammoPickUp);
+SDL_RenderCopy(r1, AmmoPkUp1, NULL, &ammoPickUp);
 //Rendering the Health Bar
-//SDL_RenderCopy(r1, HBarBack, NULL, &HealthBarBack);
-//SDL_RenderCopy(r1, HBarFront, NULL, &HealthBarFront);
-//SDL_RenderCopy(r1, WindmillTexture, NULL, &Windmill);
-//SDL_RenderCopy(r1, WindmillTexture2, NULL, &Windmill2);
+SDL_RenderCopy(r1, HBarBack, NULL, &HealthBarBack);
+SDL_RenderCopy(r1, HBarFront, NULL, &HealthBarFront);
+SDL_RenderCopy(r1, WindmillTexture, NULL, &Windmill);
+SDL_RenderCopy(r1, WindmillTexture2, NULL, &Windmill2);
 //Rendering the Ammo GUI
-//SDL_RenderCopy(r1, MBarBack, NULL, &ManaBarBack);
-//SDL_RenderCopy(r1, MBarFront, NULL, &ManaBarFront);
-//SDL_RenderCopy(r1, ManaPot, NULL, &ManaPotion);
-////Rendering the enemy texture
-//SDL_RenderCopy(r1, EnemyTexture, NULL, &Enemy);
+SDL_RenderCopy(r1, MBarBack, NULL, &ManaBarBack);
+SDL_RenderCopy(r1, MBarFront, NULL, &ManaBarFront);
+SDL_RenderCopy(r1, ManaPot, NULL, &ManaPotion);
+//Rendering the enemy texture
+SDL_RenderCopy(r1, EnemyTexture, NULL, &Enemy);
 SDL_RenderCopy(r1,TurretTexture,NULL,&Turret);
-SDL_RenderCopy(r1,EBulletTexture,NULL,&EnemyBullet);
+SDL_RenderCopy(r1,HitBox,NULL,&TurretVision);
+//Rendering the Enemy Bullet
+tempBullet.DrawBullet(r1);
 //Rendering the Keys in the level
-/*if (hasPinkKey != true)
+if (hasPinkKey != true)
 {
 	SDL_RenderCopy(r1, PinkKeyTexture, NULL, &PinkKey);
-}*/
-/*if (hasBlackKey != true)
+}
+if (hasBlackKey != true)
 {
 	SDL_RenderCopy(r1, BlackKeyTexture, NULL, &BlackKey);
-}*/
-/*if (hasPurpleKey != true)
+}
+if (hasPurpleKey != true)
 {
 	SDL_RenderCopy(r1, PurpleKeyTexture, NULL, &PurpleKey);
-}*/
+}
 //Rendering the Keys for the GUI
-/*if (hasPinkKey == true)
-{*/
-	/*SDL_RenderCopy(r1, PinkKeyGUITexture, NULL, &PinkKeyGUI);*/
-/*}*/
-/*if (hasBlackKey == true)
-{*/
-	/*SDL_RenderCopy(r1, BlackKeyGUITexture, NULL, &BlackKeyGUI);*/
-/*}*/
-/*if (hasPurpleKey == true)
-{*/
-	/*SDL_RenderCopy(r1, PurpleKeyGUITexture, NULL, &PurpleKeyGUI);*/
-/*}*/
+if (hasPinkKey == true)
+{
+	SDL_RenderCopy(r1, PinkKeyGUITexture, NULL, &PinkKeyGUI);
+}
+if (hasBlackKey == true)
+{
+	SDL_RenderCopy(r1, BlackKeyGUITexture, NULL, &BlackKeyGUI);
+}
+if (hasPurpleKey == true)
+{
+	SDL_RenderCopy(r1, PurpleKeyGUITexture, NULL, &PurpleKeyGUI);
+}
 
 //Wall Texture Code
 SDL_RenderCopy(r1,w1,NULL,&Wall);
@@ -682,6 +748,7 @@ SDL_RenderCopy(r1, w12, NULL, &Wall12);
 SDL_RenderPresent(r1);
 //SDL Drawing Process End//
 SDL_Delay(16);
+}
 }
 //End of Game Loop//
 SDL_DestroyWindow(window);
