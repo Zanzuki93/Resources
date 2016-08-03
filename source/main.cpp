@@ -348,7 +348,6 @@ TurretVision.y = -885;
 TurretVision.w = 400;
 TurretVision.h = 50;
 SDL_Texture * HitBox = IMG_LoadTexture(r1,(images_dir + "placeholder.png").c_str());
-SDL_Rect EBullet;
 //Error Messages For Texture File Paths
 if (t1 == NULL)
 {
@@ -422,7 +421,7 @@ while(inGame)
 			}
 		 }
 	  }
-
+	}
 	//Input End//
 
 
@@ -748,7 +747,7 @@ SDL_RenderCopy(r1, w12, NULL, &Wall12);
 SDL_RenderPresent(r1);
 //SDL Drawing Process End//
 SDL_Delay(16);
-}
+
 }
 //End of Game Loop//
 SDL_DestroyWindow(window);
