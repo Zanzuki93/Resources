@@ -32,6 +32,7 @@ using namespace std;
 #include <iostream>
 #include <vector>
 #include <string>
+#include <ctime>
 class PlayerBullet
 {
 public:
@@ -172,10 +173,16 @@ string currentWorkingDirectory(getcwd(NULL, 0));
  int ammoCount = 10;
  bool hasBlackKey = false, hasPinkKey = false, hasPurpleKey = false;
  bool inGame = true;
+ srand(time(NULL));
+ //Ammo Arrays
  vector <EnemyBullet> BulletList;
  vector<PlayerBullet> ListofAmmo;
+ //Variable set up to allow for left and right movement
 const Uint8 * State = SDL_GetKeyboardState(NULL);
-
+//Turret Parameters
+int turretHealth = 0;
+turretHealth = rand()%20;
+bool turretDead = false;
 SDL_Event event;
 SDL_Window *window;
 //initialize SDL
@@ -413,9 +420,52 @@ TurretVision.h = 50;
 //Creating Enemy Bullet
 EnemyBullet tempBullet = EnemyBullet((images_dir + "EnemyBulletTextureRight.png").c_str(),r1);
 BulletList.push_back(tempBullet);
+//****************1st Enemy Bullet*************//
+EnemyBullet tempBullet2 = EnemyBullet((images_dir + "EnemyBulletTextureRight.png").c_str(),r1);
+BulletList.push_back(tempBullet2);
+//****************2nd Enemy Bullet*************//
+EnemyBullet tempBullet3 = EnemyBullet((images_dir + "EnemyBulletTextureRight.png").c_str(),r1);
+BulletList.push_back(tempBullet3);
+//****************3rd Enemy Bullet*************//
+EnemyBullet tempBullet4 = EnemyBullet((images_dir + "EnemyBulletTextureRight.png").c_str(),r1);
+BulletList.push_back(tempBullet4);
+//****************4th Enemy Bullet*************//
+EnemyBullet tempBullet5 = EnemyBullet((images_dir + "EnemyBulletTextureRight.png").c_str(),r1);
+BulletList.push_back(tempBullet5);
+//****************5th Enemy Bullet*************//
 
+
+//Creating Player Bullets
 PlayerBullet tempPBullet = PlayerBullet((images_dir + "EnemyBulletTextureLeft.png").c_str(),r1);
 ListofAmmo.push_back(tempPBullet);
+//****************1st Bullet*******************//
+PlayerBullet tempPBullet1 = PlayerBullet((images_dir + "EnemyBulletTextureLeft.png").c_str(),r1);
+ListofAmmo.push_back(tempPBullet1);
+//****************2nd Bullet*******************//
+PlayerBullet tempPBullet2 = PlayerBullet((images_dir + "EnemyBulletTextureLeft.png").c_str(),r1);
+ListofAmmo.push_back(tempPBullet2);
+//****************3rd Bullet*******************//
+PlayerBullet tempPBullet3 = PlayerBullet((images_dir + "EnemyBulletTextureLeft.png").c_str(),r1);
+ListofAmmo.push_back(tempPBullet3);
+//****************4th Bullet*******************//
+PlayerBullet tempPBullet4 = PlayerBullet((images_dir + "EnemyBulletTextureLeft.png").c_str(),r1);
+ListofAmmo.push_back(tempPBullet4);
+//****************5th Bullet*******************//
+PlayerBullet tempPBullet5 = PlayerBullet((images_dir + "EnemyBulletTextureLeft.png").c_str(),r1);
+ListofAmmo.push_back(tempPBullet5);
+//****************6th Bullet*******************//
+PlayerBullet tempPBullet6 = PlayerBullet((images_dir + "EnemyBulletTextureLeft.png").c_str(),r1);
+ListofAmmo.push_back(tempPBullet6);
+//****************7th Bullet*******************//
+PlayerBullet tempPBullet7 = PlayerBullet((images_dir + "EnemyBulletTextureLeft.png").c_str(),r1);
+ListofAmmo.push_back(tempPBullet7);
+//****************8th Bullet*******************//
+PlayerBullet tempPBullet8 = PlayerBullet((images_dir + "EnemyBulletTextureLeft.png").c_str(),r1);
+ListofAmmo.push_back(tempPBullet8);
+//****************9th Bullet*******************//
+PlayerBullet tempPBullet9 = PlayerBullet((images_dir + "EnemyBulletTextureLeft.png").c_str(),r1);
+ListofAmmo.push_back(tempPBullet9);
+//****************10th Bullet*******************//
 
 //Error Messages For Texture File Paths
 if (t1 == NULL)
@@ -447,27 +497,41 @@ while(inGame)
 	 {
 		 if(event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
 			{
-			 if(State[SDL_SCANCODE_A] && State[SDL_SCANCODE_P] && ListofAmmo[0].isActive == false)
+			 if(State[SDL_SCANCODE_A] && State[SDL_SCANCODE_P])
+			   {
+			  cout << "The A and P are pressed down"<<endl;
+			  ManaBarFront.w -= 20;
+			  ammoCount -= 1;
+			  for(int i = 0; i < 9; i++)
 			 {
-			 cout << "The A and P are pressed down"<<endl;
-			 ListofAmmo[0].PBullet.x = Player.x;
-			 ListofAmmo[0].PBullet.y = Player.y;
-			 ListofAmmo[0].isActive = true;
-			 ManaBarFront.w -= 20;
-			 ammoCount -= 1;
-			ListofAmmo[0].BulletDir = -1;
-			 }
-			 if(State[SDL_SCANCODE_D] && State[SDL_SCANCODE_P] && ListofAmmo[0].isActive == false)
-			{
+			if(ListofAmmo[i].isActive == false){
+			 ListofAmmo[i].PBullet.x = Player.x;
+			 ListofAmmo[i].PBullet.y = Player.y;
+			 ListofAmmo[i].isActive = true;
+			 //cout <<" Who is an active bullet!?" << ListofAmmo[i].isActive <<endl;
+			 ListofAmmo[i].BulletDir = -1;
+			 break;}
+			}
+			}
+			 if(State[SDL_SCANCODE_D] && State[SDL_SCANCODE_P])
+			 {
 			 cout <<"The D Key and P are pressed down"<<endl;
-			 ListofAmmo[0].PBullet.x = Player.x;
-			 ListofAmmo[0].PBullet.y = Player.y;
-			 ListofAmmo[0].isActive = true;
 			 ManaBarFront.w -= 20;
 			 ammoCount -= 1;
-			 ListofAmmo[0].BulletDir = 1;
+			for(int j =0; j<9; j++)
+			{
+			if(ListofAmmo[j].isActive == false)
+			{
+			 ListofAmmo[j].PBullet.x = Player.x;
+			 ListofAmmo[j].PBullet.y = Player.y;
+			 ListofAmmo[j].isActive = true;
+			//cout <<" Who is an active bullet!?" << ListofAmmo[j].isActive <<endl;
+			 ListofAmmo[j].BulletDir = 1;
+			break;
+			}
 			}
 		   }
+		}
 		  if(event.type == SDL_KEYDOWN && event.key.repeat == 0)
 		  {
 
@@ -514,8 +578,20 @@ while(inGame)
 	}
 	//Input End//
 	//Update Bullets
-	ListofAmmo[0].Update();
-	BulletList[0].Update();
+	for(int p =0; p<9; p++)
+	{
+		if(ListofAmmo[p].isActive == true)
+		{
+			ListofAmmo[p].Update();
+		}
+	}
+	for(int k = 0; k <4; k++)
+	{
+		if(BulletList[k].isActive == true)
+		{
+			BulletList[k].Update();
+		}
+	}
 	//Update Player//
 	//Adjusting the screen Horizontally
 	Player.x += PlayerVelX;
@@ -599,29 +675,59 @@ while(inGame)
 		tempBullet.EnemBullet.x = -1000;
 		tempBullet.EnemBullet.y = -1000;
 	}*/
-	if(SDL_HasIntersection(&Player,&BulletList[0].EnemBullet))
+	for(int eb =0; eb <4; eb++)
 	{
-		HealthBarFront.w -= 10;
-		playerHealth -=5;
-		BulletList[0].EnemBullet.x = -1000;
-		BulletList[0].EnemBullet.y = -1000;
-		BulletList[0].isActive = false;
+		if(SDL_HasIntersection(&Player,&BulletList[0].EnemBullet))
+		{
+			HealthBarFront.w -= 10;
+			playerHealth -=5;
+			BulletList[eb].EnemBullet.x = -1000;
+			BulletList[eb].EnemBullet.y = -1000;
+			BulletList[eb].isActive = false;
+		}
 	}
-	if(SDL_HasIntersection(&Player,&TurretVision)&& BulletList[0].isActive == false)
+	if(SDL_HasIntersection(&Player,&TurretVision))
 	{
-		cout <<"Turret Found The Player >:) "<<endl;
-		BulletList[0].EnemBullet.x = Turret.x;
-		BulletList[0].EnemBullet.y = Turret.y;
-		BulletList[0].isActive = true;
+		int random_number = rand()%5;
+		if(turretDead == false)
+		{
+			for(int t =0; t<4; t++)
+			{
+				if(BulletList[t].isActive == false && random_number == 1)
+				{
+				cout <<"Turret Found The Player >:) "<<endl;
+				BulletList[t].EnemBullet.x = Turret.x;
+				BulletList[t].EnemBullet.y = Turret.y;
+				BulletList[t].isActive = true;
+				}
+			}
+		}
+		else
+		{
+			TurretVision.x = -1000;
+			TurretVision.y = -1000;
+		}
 	}
 	//PlayerBullet Colliding with Turret
-	if(SDL_HasIntersection(&Turret,&ListofAmmo[0].PBullet))
+	for(int pb =0; pb<9; pb++)
 	{
-		Turret.x =-1000;
-		Turret.y = -2000;
-		ListofAmmo[0].PBullet.x = 2000;
-		ListofAmmo[0].PBullet.y = 2000;
-		ListofAmmo[0].isActive = false;
+		if(SDL_HasIntersection(&Turret,&ListofAmmo[pb].PBullet))
+		{
+		turretHealth -= 5;
+		ListofAmmo[pb].PBullet.x = 2000;
+		ListofAmmo[pb].PBullet.y = 2000;
+		ListofAmmo[pb].isActive = false;
+			if(turretHealth <= 0)
+			{
+			turretHealth = 0;
+			turretDead = true;
+			Turret.x =-1000;
+			Turret.y = -2000;
+			ListofAmmo[pb].PBullet.x = 2000;
+			ListofAmmo[pb].PBullet.y = 2000;
+			ListofAmmo[pb].isActive = false;
+			}
+		}
 	}
 	//Key Collision
 	if (SDL_HasIntersection(&Player, &PinkKey))
@@ -819,8 +925,20 @@ SDL_RenderCopy(r1,TurretTexture,NULL,&Turret);
 //SDL_RenderCopy(r1,HitBox,NULL,&TurretVision);
 //Rendering the Enemy Bullet
 //tempBullet.DrawBullet(r1);
-BulletList[0].DrawBullet(r1);
-ListofAmmo[0].DrawBullet(r1);
+//EnemyBullets
+for(int eb =0; eb <4; eb++)
+{
+	if(BulletList[eb].isActive == true)
+	BulletList[eb].DrawBullet(r1);
+}
+//PlayerBullets
+for(int l = 0; l<9; l++)
+{
+	if(ListofAmmo[l].isActive == true)
+	{
+		ListofAmmo[l].DrawBullet(r1);
+	}
+}
 //Rendering the Keys in the level
 if (hasPinkKey != true)
 {
