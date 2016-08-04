@@ -166,8 +166,6 @@ string currentWorkingDirectory(getcwd(NULL, 0));
  string images_dir = currentWorkingDirectory + "/Resources/images/";
 #endif
 
-
-
  SDL_Renderer* r1;
  int playerHealth = 100;
  int ammoCount = 10;
@@ -200,11 +198,10 @@ Player.y = 620;
 Player.h = 50;
 Player.w = 10;
 
-const int Player_Vel = 5;
-
+const int Player_Vel = 10;
 int PlayerVelX = 0;
 int PlayerVelY = 0;
-
+bool isGrounded = true;
 SDL_Texture * t2 = IMG_LoadTexture(r1,(images_dir+"TestImage.png").c_str());
 
 //create the background texture
@@ -298,6 +295,13 @@ Wall12.y = 670;
 Wall12.w = 875;
 Wall12.h = 30;
 SDL_Texture *w12 = IMG_LoadTexture(r1,(images_dir + "WallTexturePlaceholder.png").c_str());
+//Creating Floating Platforms
+SDL_Rect Platform;
+Platform.x = Player.x +40;
+Platform.y = Player.y -10;
+Platform.w = 40;
+Platform.h = 10;
+SDL_Texture *p1 = IMG_LoadTexture(r1,(images_dir + "WallTexturePlaceholder.png").c_str());
 //Creating a pickup
 SDL_Rect healthPickUp;
 healthPickUp.x = 700;
@@ -416,7 +420,7 @@ TurretVision.x = 40;
 TurretVision.y = -885;
 TurretVision.w = 400;
 TurretVision.h = 50;
-//SDL_Texture * HitBox = IMG_LoadTexture(r1,(images_dir + "placeholder.png").c_str());
+
 //Creating Enemy Bullet
 EnemyBullet tempBullet = EnemyBullet((images_dir + "EnemyBulletTextureRight.png").c_str(),r1);
 BulletList.push_back(tempBullet);
@@ -552,7 +556,10 @@ while(inGame)
 				 case SDLK_d:
 				 PlayerVelX += Player_Vel;
 				 break;
-
+				 case SDLK_SPACE:
+				isGrounded = false;
+				Player.y -= Player_Vel*20;
+				break;
 			  }
 		  }
 
@@ -578,7 +585,7 @@ while(inGame)
 	}
 	//Input End//
 	//Update Bullets
-	for(int p =0; p<9; p++)
+	for(int p = 0; p<9; p++)
 	{
 		if(ListofAmmo[p].isActive == true)
 		{
@@ -596,6 +603,10 @@ while(inGame)
 	//Adjusting the screen Horizontally
 	Player.x += PlayerVelX;
 	Player.y += PlayerVelY;
+	if(isGrounded == false)
+	{
+		Player.y += Player_Vel/2;
+	}
 	if(Player.x > 1024 - (Player.w * 2))
 		{
 			Player.x = 1024 - (Player.w*2);
@@ -659,6 +670,11 @@ while(inGame)
 		SDL_HasIntersection(&Player,&Wall11)||SDL_HasIntersection(&Player,&Wall12))
 	{
 		Player.x -= PlayerVelX;
+	}//Platform Collision
+	if(SDL_HasIntersection(&Player, &Platform))
+	{
+		Player.y -= PlayerVelY;
+		isGrounded = true;
 	}
 	//Enemy Collision
 	if (SDL_HasIntersection(&Player, &Enemy))
@@ -844,7 +860,8 @@ while(inGame)
 		SDL_HasIntersection(&Player, &Wall9)||SDL_HasIntersection(&Player, &Wall10)||
 		SDL_HasIntersection(&Player,&Wall11)||SDL_HasIntersection(&Player,&Wall12))
 	{
-		Player.y -= PlayerVelY;
+		Player.y -= PlayerVelY+2;
+		isGrounded = true;
 	}
 	//Enemy Collision
 	if (SDL_HasIntersection(&Player, &Enemy))
@@ -991,6 +1008,7 @@ SDL_RenderCopy(r1, w11, NULL, &Wall11);
 
 SDL_RenderCopy(r1, w12, NULL, &Wall12);
 
+SDL_RenderCopy(r1, p1, NULL,&Platform);
 SDL_RenderPresent(r1);
 //SDL Drawing Process End//
 SDL_Delay(16);
