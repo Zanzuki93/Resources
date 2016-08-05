@@ -201,7 +201,7 @@ Player.w = 10;
 const int Player_Vel = 10;
 int PlayerVelX = 0;
 int PlayerVelY = 0;
-bool isGrounded = true;
+bool isGrounded = false;
 SDL_Texture * t2 = IMG_LoadTexture(r1,(images_dir+"TestImage.png").c_str());
 
 //create the background texture
@@ -609,7 +609,7 @@ while(inGame)
 	}
 	if(Player.x > 1024 - (Player.w * 2))
 		{
-			Player.x = 1024 - (Player.w*2);
+			Player.x = 1024 - (Player.w*3);
 			Background.x -= PlayerVelX;
 
 			Wall.x -= PlayerVelX;
@@ -795,9 +795,9 @@ while(inGame)
 		ManaBarFront.w = 0;
 	}
 	//Adjusting the screen Vertically
-	if (Player.y < 0 + (Player.h * 2))
+	if (Player.y < 0 + (Player.h * 3))
 	{
-		Player.y = 0 + (Player.h * 2);
+		Player.y = 0 + (Player.h * 3);
 		Background.y -= PlayerVelY;
 
 		Wall.y -= PlayerVelY;
@@ -823,9 +823,9 @@ while(inGame)
 		tempBullet.EnemBullet.y -= PlayerVelY;
 	}
 
-	if(Player.y > 768 - (Player.h * 2))
+	if(Player.y > 768 - (Player.h * 3))
 	{
-		Player.y = 768 - (Player.h * 2);
+		Player.y = 768 - (Player.h * 3);
 		Background.y -= PlayerVelY;
 
 		Wall.y -= PlayerVelY;
@@ -939,7 +939,6 @@ SDL_RenderCopy(r1, ManaPot, NULL, &ManaPotion);
 //Rendering the enemy texture
 SDL_RenderCopy(r1, EnemyTexture, NULL, &Enemy);
 SDL_RenderCopy(r1,TurretTexture,NULL,&Turret);
-//SDL_RenderCopy(r1,HitBox,NULL,&TurretVision);
 //Rendering the Enemy Bullet
 //tempBullet.DrawBullet(r1);
 //EnemyBullets
