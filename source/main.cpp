@@ -181,6 +181,9 @@ const Uint8 * State = SDL_GetKeyboardState(NULL);
 int turretHealth = 0;
 turretHealth = rand()%20;
 bool turretDead = false;
+//Disciple Parameters
+int discipleHealth = rand()%20;
+bool discipleDead = false;
 SDL_Event event;
 SDL_Window *window;
 //initialize SDL
@@ -196,12 +199,12 @@ SDL_Rect Player;
 Player.x = 750;
 Player.y = 620;
 Player.h = 50;
-Player.w = 10;
+Player.w = 30;
 
-const int Player_Vel = 10;
+const int Player_Vel = 5;
 int PlayerVelX = 0;
 int PlayerVelY = 0;
-bool isGrounded = false;
+bool isGrounded = true;
 SDL_Texture * t2 = IMG_LoadTexture(r1,(images_dir+"TestImage.png").c_str());
 
 //create the background texture
@@ -420,7 +423,19 @@ TurretVision.x = Turret.x + 20;
 TurretVision.y = Turret.y;
 TurretVision.w = 400;
 TurretVision.h = 50;
-
+//Creating Moving Enemy
+SDL_Rect Disciple;
+Disciple.x = 800;
+Disciple.y = -885;
+Disciple.w = 50;
+Disciple.h = 100;
+SDL_Texture * DiscipleTexture = IMG_LoadTexture(r1,(images_dir + "DiscipleLeft.png").c_str());
+SDL_Rect DiscipleVision;
+DiscipleVision.x = Disciple.x - 75;
+DiscipleVision.y = Disciple.y;
+DiscipleVision.w = 200;
+DiscipleVision.h = 100;
+SDL_Texture * DiscipleVisionTexture = IMG_LoadTexture(r1,(images_dir + "testimage.png").c_str());
 //Creating Enemy Bullet
 EnemyBullet tempBullet = EnemyBullet((images_dir + "EnemyBulletTextureRight.png").c_str(),r1);
 BulletList.push_back(tempBullet);
@@ -501,7 +516,7 @@ while(inGame)
 	 {
 		 if(event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
 			{
-			 if(State[SDL_SCANCODE_A] && State[SDL_SCANCODE_P])
+			 if(State[SDL_SCANCODE_A] && State[SDL_SCANCODE_P] && ammoCount >0)
 			   {
 			  cout << "The A and P are pressed down"<<endl;
 			  ManaBarFront.w -= 20;
@@ -517,7 +532,7 @@ while(inGame)
 			 break;}
 			}
 			}
-			 if(State[SDL_SCANCODE_D] && State[SDL_SCANCODE_P])
+			 if(State[SDL_SCANCODE_D] && State[SDL_SCANCODE_P] && ammoCount >0 )
 			 {
 			 cout <<"The D Key and P are pressed down"<<endl;
 			 ManaBarFront.w -= 20;
@@ -559,7 +574,7 @@ while(inGame)
 				 break;
 				 case SDLK_SPACE:
 				isGrounded = false;
-				Player.y -= Player_Vel*14.8;
+				PlayerVelY -= Player_Vel * 4;
 				break;
 			  }
 		  }
@@ -624,10 +639,8 @@ while(inGame)
 	//Adjusting the screen Horizontally
 	Player.x += PlayerVelX;
 	Player.y += PlayerVelY;
-	if(isGrounded == false)
-	{
-		Player.y += Player_Vel/2;
-	}
+
+	//End of Updating Falling Screen Transition
 	if(Player.x > 1024 - (Player.w * 2))
 		{
 			Player.x = 1024 - (Player.w*2);
@@ -651,6 +664,8 @@ while(inGame)
 			PurpleKey.x -= PlayerVelX;
 			BlackKey.x -= PlayerVelX;
 			Enemy.x -= PlayerVelX;
+			Disciple.x -=PlayerVelX;
+			DiscipleVision.x -= PlayerVelX;
 			Turret.x -=PlayerVelX;
 			TurretVision.x -=PlayerVelX;
 			tempBullet.EnemBullet.x -= PlayerVelX;
@@ -679,6 +694,8 @@ while(inGame)
 				PurpleKey.x -= PlayerVelX;
 				BlackKey.x -= PlayerVelX;
 				Enemy.x -= PlayerVelX;
+				Disciple.x -=PlayerVelX;
+				DiscipleVision.x -= PlayerVelX;
 				Turret.x -=PlayerVelX;
 				TurretVision.x -=PlayerVelX;
 				tempBullet.EnemBullet.x -= PlayerVelX;
@@ -711,8 +728,8 @@ while(inGame)
 	{
 		if(SDL_HasIntersection(&Player,&BulletList[0].EnemBullet))
 		{
-			/*HealthBarFront.w -= 10;
-			playerHealth -=5;*/
+			HealthBarFront.w -= 10;
+			playerHealth -=5;
 			BulletList[eb].EnemBullet.x = -1000;
 			BulletList[eb].EnemBullet.y = -1000;
 			BulletList[eb].isActive = false;
@@ -741,13 +758,56 @@ while(inGame)
 			TurretVision.y = -1000;
 		}
 	}
-	
+	//Disciple Detection Box
+	if(SDL_HasIntersection(&Player,&DiscipleVision))
+	{
+		if(Player.x > Disciple.x)
+		{
+		Disciple.x +=2;
+		DiscipleVision.x = Disciple.x -75;
+		DiscipleTexture = IMG_LoadTexture(r1,(images_dir + "DiscipleRight.png").c_str());
+		}
+		if(Player.x < Disciple.x)
+		{
+		Disciple.x -= 2;
+		DiscipleVision.x = Disciple.x-75;
+		DiscipleTexture = IMG_LoadTexture(r1,(images_dir + "DiscipleLeft.png").c_str());
+		}
+	}
+	if(SDL_HasIntersection(&Player,&Disciple))
+	{
+		HealthBarFront.w -= 20;
+		playerHealth -=10;
+	}
+	//PlayerBullet Colliding with Disciple
+		 for(int pb =0; pb<9; pb++)
+		{
+			if(SDL_HasIntersection(&Disciple,&ListofAmmo[pb].PBullet))
+			{
+			discipleHealth -=5;
+			ListofAmmo[pb].PBullet.x = 2000;
+			ListofAmmo[pb].PBullet.y = 2000;
+			ListofAmmo[pb].isActive = false;
+				if(discipleHealth <= 0)
+				{
+				discipleHealth = 0;
+				discipleDead = true;
+				Disciple.x =-1000;
+				Disciple.y = -3000;
+				DiscipleVision.x -1000;
+				DiscipleVision.y -3000;
+				ListofAmmo[pb].PBullet.x = 2000;
+				ListofAmmo[pb].PBullet.y = 2000;
+				ListofAmmo[pb].isActive = false;
+				}
+			}
+		}
 	//PlayerBullet Colliding with Turret
 	 for(int pb =0; pb<9; pb++)
 	{
 		if(SDL_HasIntersection(&Turret,&ListofAmmo[pb].PBullet))
 		{
-		//turretHealth -= 5;
+		turretHealth -= 5;
 		ListofAmmo[pb].PBullet.x = 2000;
 		ListofAmmo[pb].PBullet.y = 2000;
 		ListofAmmo[pb].isActive = false;
@@ -813,65 +873,139 @@ while(inGame)
 		ammoCount = 0;
 		ManaBarFront.w = 0;
 	}
+	//Checking to see if the player is in air or not
+		if(isGrounded == false)
+		{
+			PlayerVelY += Player_Vel/5;
+
+			if (Player.y < 0 + (Player.h * 2))
+				{
+					Player.y = 0 + (Player.h * 2);
+					Background.y -= PlayerVelY;
+
+					Wall.y -= PlayerVelY;
+					Wall2.y -= PlayerVelY;
+					Wall3.y -= PlayerVelY;
+					Wall4.y -= PlayerVelY;
+					Wall5.y -= PlayerVelY;
+					Wall6.y -= PlayerVelY;
+					Wall7.y -= PlayerVelY;
+					Wall8.y -= PlayerVelY;
+					Wall9.y -= PlayerVelY;
+					Wall10.y -= PlayerVelY;
+					Wall11.y -=PlayerVelY;
+					Wall12.y -=PlayerVelY;
+					healthPickUp.y -= PlayerVelY;
+					ammoPickUp.y -= PlayerVelY;
+					PinkKey.y -= PlayerVelY;
+					PurpleKey.y -= PlayerVelY;
+					BlackKey.y -= PlayerVelY;
+					Enemy.y -= PlayerVelY;
+					Disciple.y -=PlayerVelY;
+					DiscipleVision.y -= PlayerVelY;
+					Turret.y -=PlayerVelY;
+					TurretVision.y -=PlayerVelY;
+					tempBullet.EnemBullet.y -= PlayerVelY;
+					Platform.y -= PlayerVelY;
+				}
+				//checking to see if while falling the player reaches the edge of the screen
+				if(Player.y > 768 - (Player.h*2))
+				{
+					Player.y = 768 - (Player.h*2);
+					Background.y -= PlayerVelY;
+
+					Wall.y -= PlayerVelY;
+					Wall2.y -= PlayerVelY;
+					Wall3.y -= PlayerVelY;
+					Wall4.y -= PlayerVelY;
+					Wall5.y -= PlayerVelY;
+					Wall6.y -= PlayerVelY;
+					Wall7.y -= PlayerVelY;
+					Wall8.y -= PlayerVelY;
+					Wall9.y -= PlayerVelY;
+					Wall10.y -= PlayerVelY;
+					Wall11.y -= PlayerVelY;
+					Wall12.y -= PlayerVelY;
+					healthPickUp.y -= PlayerVelY;
+					ammoPickUp.y -= PlayerVelY;
+					PinkKey.y -= PlayerVelY;
+					PurpleKey.y -= PlayerVelY;
+					BlackKey.y -= PlayerVelY;
+					Enemy.y -= PlayerVelY;
+					Disciple.y -=PlayerVelY;
+					DiscipleVision.y -= PlayerVelY;
+					Turret.y -= PlayerVelY;
+					TurretVision.y -= PlayerVelY;
+					tempBullet.EnemBullet.y -= PlayerVelY;
+					Platform.y -= PlayerVelY;
+				}
+
+		}
 	//Adjusting the screen Vertically
-	if (Player.y < 0 + (Player.h * 2))
+	if(isGrounded == true)
 	{
-		Player.y = 0 + (Player.h * 2);
-		Background.y -= PlayerVelY;
+		if (Player.y < 0 + (Player.h * 2))
+		{
+			Player.y = 0 + (Player.h * 2);
+			Background.y -= PlayerVelY;
 
-		Wall.y -= PlayerVelY;
-		Wall2.y -= PlayerVelY;
-		Wall3.y -= PlayerVelY;
-		Wall4.y -= PlayerVelY;
-		Wall5.y -= PlayerVelY;
-		Wall6.y -= PlayerVelY;
-		Wall7.y -= PlayerVelY;
-		Wall8.y -= PlayerVelY;
-		Wall9.y -= PlayerVelY;
-		Wall10.y -= PlayerVelY;
-		Wall11.y -=PlayerVelY;
-		Wall12.y -=PlayerVelY;
-		healthPickUp.y -= PlayerVelY;
-		ammoPickUp.y -= PlayerVelY;
-		PinkKey.y -= PlayerVelY;
-		PurpleKey.y -= PlayerVelY;
-		BlackKey.y -= PlayerVelY;
-		Enemy.y -= PlayerVelY;
-		Turret.y -=PlayerVelY;
-		TurretVision.y -=PlayerVelY;
-		tempBullet.EnemBullet.y -= PlayerVelY;
-		Platform.y -= PlayerVelY;
+			Wall.y -= PlayerVelY;
+			Wall2.y -= PlayerVelY;
+			Wall3.y -= PlayerVelY;
+			Wall4.y -= PlayerVelY;
+			Wall5.y -= PlayerVelY;
+			Wall6.y -= PlayerVelY;
+			Wall7.y -= PlayerVelY;
+			Wall8.y -= PlayerVelY;
+			Wall9.y -= PlayerVelY;
+			Wall10.y -= PlayerVelY;
+			Wall11.y -= PlayerVelY;
+			Wall12.y -= PlayerVelY;
+			healthPickUp.y -= PlayerVelY;
+			ammoPickUp.y -= PlayerVelY;
+			PinkKey.y -= PlayerVelY;
+			PurpleKey.y -= PlayerVelY;
+			BlackKey.y -= PlayerVelY;
+			Enemy.y -= PlayerVelY;
+			Disciple.y -=PlayerVelY;
+			DiscipleVision.y -= PlayerVelY;
+			Turret.y -=PlayerVelY;
+			TurretVision.y -=PlayerVelY;
+			tempBullet.EnemBullet.y -= PlayerVelY;
+			Platform.y -= PlayerVelY;
+		}
+
+		if(Player.y > 768 - (Player.h * 2))
+		{
+			Player.y = 768 - (Player.h * 2);
+			Background.y -= PlayerVelY;
+
+			Wall.y -= PlayerVelY;
+			Wall2.y -= PlayerVelY;
+			Wall3.y -= PlayerVelY;
+			Wall4.y -= PlayerVelY;
+			Wall5.y -= PlayerVelY;
+			Wall6.y -= PlayerVelY;
+			Wall7.y -= PlayerVelY;
+			Wall8.y -= PlayerVelY;
+			Wall9.y -= PlayerVelY;
+			Wall10.y -= PlayerVelY;
+			Wall11.y -= PlayerVelY;
+			Wall12.y -= PlayerVelY;
+			healthPickUp.y -= PlayerVelY;
+			ammoPickUp.y -= PlayerVelY;
+			PinkKey.y -= PlayerVelY;
+			PurpleKey.y -= PlayerVelY;
+			BlackKey.y -= PlayerVelY;
+			Enemy.y -= PlayerVelY;
+			Disciple.y -=PlayerVelY;
+			DiscipleVision.y -= PlayerVelY;
+			Turret.y -= PlayerVelY;
+			TurretVision.y -= PlayerVelY;
+			tempBullet.EnemBullet.y -= PlayerVelY;
+			Platform.y -= PlayerVelY;
+		}
 	}
-
-	if(Player.y > 768 - (Player.h * 2))
-	{
-		Player.y = 768 - (Player.h * 2);
-		Background.y -= PlayerVelY;
-
-		Wall.y -= PlayerVelY;
-		Wall2.y -= PlayerVelY;
-		Wall3.y -= PlayerVelY;
-		Wall4.y -= PlayerVelY;
-		Wall5.y -= PlayerVelY;
-		Wall6.y -= PlayerVelY;
-		Wall7.y -= PlayerVelY;
-		Wall8.y -= PlayerVelY;
-		Wall9.y -= PlayerVelY;
-		Wall10.y -= PlayerVelY;
-		Wall11.y -= PlayerVelY;
-		Wall12.y -= PlayerVelY;
-		healthPickUp.y -= PlayerVelY;
-		ammoPickUp.y -= PlayerVelY;
-		PinkKey.y -= PlayerVelY;
-		PurpleKey.y -= PlayerVelY;
-		BlackKey.y -= PlayerVelY;
-		Enemy.y -= PlayerVelY;
-		Turret.y -= PlayerVelY;
-		TurretVision.y -= PlayerVelY;
-		tempBullet.EnemBullet.y -= PlayerVelY;
-		Platform.y -= PlayerVelY;
-	}
-
 
 	////Checking For collision with walls Up and Down
 	if (SDL_HasIntersection(&Player, &Wall) || SDL_HasIntersection(&Player, &Wall2) ||
@@ -881,14 +1015,16 @@ while(inGame)
 		SDL_HasIntersection(&Player, &Wall9)||SDL_HasIntersection(&Player, &Wall10)||
 		SDL_HasIntersection(&Player,&Wall11)||SDL_HasIntersection(&Player,&Wall12))
 	{
-		Player.y -= PlayerVelY + 8;
 		isGrounded = true;
+		Player.y -= PlayerVelY;
+		PlayerVelY = 0;
 	}
 	//Platform Collision
 	if (SDL_HasIntersection(&Player, &Platform))
 	{
-		Player.y -= PlayerVelY + 8;
 		isGrounded = true;
+		Player.y -= PlayerVelY;
+		PlayerVelY = 0;
 	}
 	//Enemy Collision
 	if (SDL_HasIntersection(&Player, &Enemy))
@@ -966,6 +1102,8 @@ SDL_RenderCopy(r1, ManaPot, NULL, &ManaPotion);
 //Rendering the enemy texture
 SDL_RenderCopy(r1, EnemyTexture, NULL, &Enemy);
 SDL_RenderCopy(r1,TurretTexture,NULL,&Turret);
+//SDL_RenderCopy(r1,DiscipleVisionTexture,NULL,&DiscipleVision);
+SDL_RenderCopy(r1,DiscipleTexture,NULL,&Disciple);
 //Rendering the Enemy Bullet
 //EnemyBullets
 for(int eb =0; eb <4; eb++)
