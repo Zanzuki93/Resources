@@ -119,7 +119,7 @@ public:
 
 	void Update()
 	{
-		if(isActive == true)
+		if(isActive == true && BulletDir == 1)
 		{
 			EnemBullet.x += BulletSpeed;
 		}
@@ -135,10 +135,10 @@ public:
 		EnemBullet.y = 2000;
 		isActive = false;
 		}
-		/*if(isActive == true)
+		if(isActive == true && BulletDir == -1)
 		{
 			EnemBullet.x -= BulletSpeed;
-		}*/
+		}
 	}
 };
 
@@ -409,15 +409,15 @@ Enemy.h = 30;
 SDL_Texture * EnemyTexture = IMG_LoadTexture(r1, (images_dir + "placeholder.png").c_str());
 //Creating a Turret Enemy
 SDL_Rect Turret;
-Turret.x = 20;
+Turret.x = 180;
 Turret.y = -885;
 Turret.w = 50;
 Turret.h = 100;
-SDL_Texture * TurretTexture = IMG_LoadTexture(r1,(images_dir +"KillerPlantRight.png").c_str());
+SDL_Texture * TurretTexture = IMG_LoadTexture(r1, (images_dir + "KillerPlantRight.png").c_str());
 //Creating Detection Box for the player
 SDL_Rect TurretVision;
-TurretVision.x = 40;
-TurretVision.y = -885;
+TurretVision.x = Turret.x + 20;
+TurretVision.y = Turret.y;
 TurretVision.w = 400;
 TurretVision.h = 50;
 
@@ -546,6 +546,7 @@ while(inGame)
 				 break;
 				 case SDLK_w:
 				 PlayerVelY -= Player_Vel;
+				 isGrounded = false;
 				 break;
 				 case SDLK_s:
 				 PlayerVelY += Player_Vel;
@@ -558,7 +559,7 @@ while(inGame)
 				 break;
 				 case SDLK_SPACE:
 				isGrounded = false;
-				Player.y -= Player_Vel*20;
+				Player.y -= Player_Vel*14.8;
 				break;
 			  }
 		  }
@@ -599,6 +600,26 @@ while(inGame)
 			BulletList[k].Update();
 		}
 	}
+	//Update Turrets//
+	if (Player.x < Turret.x)
+	{
+		TurretVision.x = Turret.x - 200;
+		TurretTexture = IMG_LoadTexture(r1, (images_dir + "KillerPlantLeft.png").c_str());
+		for (int eb = 0; eb < 4; eb++)
+		{
+			BulletList[eb].BulletDir = -1;
+		}
+	}
+	if (Player.x > Turret.x)
+	{
+		TurretVision.x = Turret.x + 20;
+		TurretTexture = IMG_LoadTexture(r1, (images_dir + "KillerPlantRight.png").c_str());
+		for (int eb = 0; eb < 4; eb++)
+		{
+			BulletList[eb].BulletDir = 1;
+		}
+	}
+
 	//Update Player//
 	//Adjusting the screen Horizontally
 	Player.x += PlayerVelX;
@@ -609,7 +630,7 @@ while(inGame)
 	}
 	if(Player.x > 1024 - (Player.w * 2))
 		{
-			Player.x = 1024 - (Player.w*3);
+			Player.x = 1024 - (Player.w*2);
 			Background.x -= PlayerVelX;
 
 			Wall.x -= PlayerVelX;
@@ -633,6 +654,7 @@ while(inGame)
 			Turret.x -=PlayerVelX;
 			TurretVision.x -=PlayerVelX;
 			tempBullet.EnemBullet.x -= PlayerVelX;
+			Platform.x -= PlayerVelX;
 		}
 	if(Player.x < 0 + (Player.w * 2))
 			{
@@ -660,6 +682,7 @@ while(inGame)
 				Turret.x -=PlayerVelX;
 				TurretVision.x -=PlayerVelX;
 				tempBullet.EnemBullet.x -= PlayerVelX;
+				Platform.x -= PlayerVelX;
 			}
 	//Checking For collision with walls and the player Left and Right
 	if (SDL_HasIntersection(&Player, &Wall) || SDL_HasIntersection(&Player, &Wall2) ||
@@ -670,11 +693,11 @@ while(inGame)
 		SDL_HasIntersection(&Player,&Wall11)||SDL_HasIntersection(&Player,&Wall12))
 	{
 		Player.x -= PlayerVelX;
-	}//Platform Collision
+	}
+	//Platform Collision
 	if(SDL_HasIntersection(&Player, &Platform))
 	{
-		Player.y -= PlayerVelY;
-		isGrounded = true;
+		Player.x -= PlayerVelX;
 	}
 	//Enemy Collision
 	if (SDL_HasIntersection(&Player, &Enemy))
@@ -684,24 +707,18 @@ while(inGame)
 		playerHealth -= 5;
 	}
 	//Enemy Bullet Collision
-	/*if(SDL_HasIntersection(&Player,&tempBullet.EnemBullet))
-	{
-		HealthBarFront.w -= 10;
-		playerHealth -= 5;
-		tempBullet.EnemBullet.x = -1000;
-		tempBullet.EnemBullet.y = -1000;
-	}*/
 	for(int eb =0; eb <4; eb++)
 	{
 		if(SDL_HasIntersection(&Player,&BulletList[0].EnemBullet))
 		{
-			HealthBarFront.w -= 10;
-			playerHealth -=5;
+			/*HealthBarFront.w -= 10;
+			playerHealth -=5;*/
 			BulletList[eb].EnemBullet.x = -1000;
 			BulletList[eb].EnemBullet.y = -1000;
 			BulletList[eb].isActive = false;
 		}
 	}
+	//Turret Detection Box
 	if(SDL_HasIntersection(&Player,&TurretVision))
 	{
 		int random_number = rand()%5;
@@ -724,12 +741,13 @@ while(inGame)
 			TurretVision.y = -1000;
 		}
 	}
+	
 	//PlayerBullet Colliding with Turret
-	for(int pb =0; pb<9; pb++)
+	 for(int pb =0; pb<9; pb++)
 	{
 		if(SDL_HasIntersection(&Turret,&ListofAmmo[pb].PBullet))
 		{
-		turretHealth -= 5;
+		//turretHealth -= 5;
 		ListofAmmo[pb].PBullet.x = 2000;
 		ListofAmmo[pb].PBullet.y = 2000;
 		ListofAmmo[pb].isActive = false;
@@ -745,6 +763,7 @@ while(inGame)
 			}
 		}
 	}
+
 	//Key Collision
 	if (SDL_HasIntersection(&Player, &PinkKey))
 	{
@@ -795,9 +814,9 @@ while(inGame)
 		ManaBarFront.w = 0;
 	}
 	//Adjusting the screen Vertically
-	if (Player.y < 0 + (Player.h * 3))
+	if (Player.y < 0 + (Player.h * 2))
 	{
-		Player.y = 0 + (Player.h * 3);
+		Player.y = 0 + (Player.h * 2);
 		Background.y -= PlayerVelY;
 
 		Wall.y -= PlayerVelY;
@@ -821,11 +840,12 @@ while(inGame)
 		Turret.y -=PlayerVelY;
 		TurretVision.y -=PlayerVelY;
 		tempBullet.EnemBullet.y -= PlayerVelY;
+		Platform.y -= PlayerVelY;
 	}
 
-	if(Player.y > 768 - (Player.h * 3))
+	if(Player.y > 768 - (Player.h * 2))
 	{
-		Player.y = 768 - (Player.h * 3);
+		Player.y = 768 - (Player.h * 2);
 		Background.y -= PlayerVelY;
 
 		Wall.y -= PlayerVelY;
@@ -838,17 +858,18 @@ while(inGame)
 		Wall8.y -= PlayerVelY;
 		Wall9.y -= PlayerVelY;
 		Wall10.y -= PlayerVelY;
-		Wall11.y -=PlayerVelY;
-		Wall12.y -=PlayerVelY;
+		Wall11.y -= PlayerVelY;
+		Wall12.y -= PlayerVelY;
 		healthPickUp.y -= PlayerVelY;
 		ammoPickUp.y -= PlayerVelY;
 		PinkKey.y -= PlayerVelY;
 		PurpleKey.y -= PlayerVelY;
 		BlackKey.y -= PlayerVelY;
 		Enemy.y -= PlayerVelY;
-		Turret.y -=PlayerVelY;
-		TurretVision.y -=PlayerVelY;
+		Turret.y -= PlayerVelY;
+		TurretVision.y -= PlayerVelY;
 		tempBullet.EnemBullet.y -= PlayerVelY;
+		Platform.y -= PlayerVelY;
 	}
 
 
@@ -860,7 +881,13 @@ while(inGame)
 		SDL_HasIntersection(&Player, &Wall9)||SDL_HasIntersection(&Player, &Wall10)||
 		SDL_HasIntersection(&Player,&Wall11)||SDL_HasIntersection(&Player,&Wall12))
 	{
-		Player.y -= PlayerVelY+2;
+		Player.y -= PlayerVelY + 8;
+		isGrounded = true;
+	}
+	//Platform Collision
+	if (SDL_HasIntersection(&Player, &Platform))
+	{
+		Player.y -= PlayerVelY + 8;
 		isGrounded = true;
 	}
 	//Enemy Collision
@@ -940,7 +967,6 @@ SDL_RenderCopy(r1, ManaPot, NULL, &ManaPotion);
 SDL_RenderCopy(r1, EnemyTexture, NULL, &Enemy);
 SDL_RenderCopy(r1,TurretTexture,NULL,&Turret);
 //Rendering the Enemy Bullet
-//tempBullet.DrawBullet(r1);
 //EnemyBullets
 for(int eb =0; eb <4; eb++)
 {
