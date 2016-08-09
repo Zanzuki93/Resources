@@ -305,6 +305,13 @@ Platform.y = Player.y -10;
 Platform.w = 40;
 Platform.h = 10;
 SDL_Texture *p1 = IMG_LoadTexture(r1,(images_dir + "WallTexturePlaceholder.png").c_str());
+//Creating Ladders
+SDL_Rect Ladder;
+Ladder.x = 700;
+Ladder.y = 660;
+Ladder.w = 100;
+Ladder.h = 330;
+SDL_Texture * LadderTexture = IMG_LoadTexture(r1,(images_dir + "LadderTexture.png").c_str());
 //Creating a pickup
 SDL_Rect healthPickUp;
 healthPickUp.x = 700;
@@ -435,6 +442,7 @@ DiscipleVision.x = Disciple.x - 75;
 DiscipleVision.y = Disciple.y;
 DiscipleVision.w = 200;
 DiscipleVision.h = 100;
+
 //Creating Enemy Bullet
 EnemyBullet tempBullet = EnemyBullet((images_dir + "EnemyBulletTextureRight.png").c_str(),r1);
 BulletList.push_back(tempBullet);
@@ -650,7 +658,6 @@ while(inGame)
 	Player.x += PlayerVelX;
 	Player.y += PlayerVelY;
 
-	//End of Updating Falling Screen Transition
 	if(Player.x > 1024 - (Player.w * 2))
 		{
 			Player.x = 1024 - (Player.w*2);
@@ -680,6 +687,7 @@ while(inGame)
 			TurretVision.x -=PlayerVelX;
 			tempBullet.EnemBullet.x -= PlayerVelX;
 			Platform.x -= PlayerVelX;
+			Ladder.x -= PlayerVelX;
 		}
 	if(Player.x < 0 + (Player.w * 2))
 			{
@@ -710,6 +718,7 @@ while(inGame)
 				TurretVision.x -=PlayerVelX;
 				tempBullet.EnemBullet.x -= PlayerVelX;
 				Platform.x -= PlayerVelX;
+				Ladder.x -= PlayerVelX;
 			}
 	//Checking For collision with walls and the player Left and Right
 	if (SDL_HasIntersection(&Player, &Wall) || SDL_HasIntersection(&Player, &Wall2) ||
@@ -915,6 +924,7 @@ while(inGame)
 					TurretVision.y -=PlayerVelY;
 					tempBullet.EnemBullet.y -= PlayerVelY;
 					Platform.y -= PlayerVelY;
+					Ladder.y -= PlayerVelY;
 				}
 				//checking to see if while falling the player reaches the edge of the screen
 				if(Player.y > 768 - (Player.h*2))
@@ -946,9 +956,16 @@ while(inGame)
 					TurretVision.y -= PlayerVelY;
 					tempBullet.EnemBullet.y -= PlayerVelY;
 					Platform.y -= PlayerVelY;
+					Ladder.y -= PlayerVelY;
 				}
+					if(PlayerVelY >= 5)
+					{
+					 PlayerVelY = 5;
+					}
+
 
 		}
+		//End of Updating Falling Screen Transition
 	//Adjusting the screen Vertically
 	if(isGrounded == true)
 	{
@@ -981,6 +998,7 @@ while(inGame)
 			TurretVision.y -=PlayerVelY;
 			tempBullet.EnemBullet.y -= PlayerVelY;
 			Platform.y -= PlayerVelY;
+			Ladder.y -= PlayerVelY;
 		}
 
 		if(Player.y > 768 - (Player.h * 2))
@@ -1012,6 +1030,7 @@ while(inGame)
 			TurretVision.y -= PlayerVelY;
 			tempBullet.EnemBullet.y -= PlayerVelY;
 			Platform.y -= PlayerVelY;
+			Ladder.y -= PlayerVelY;
 		}
 	}
 
@@ -1029,6 +1048,13 @@ while(inGame)
 	}
 	//Platform Collision
 	if (SDL_HasIntersection(&Player, &Platform))
+	{
+		isGrounded = true;
+		Player.y -= PlayerVelY;
+		PlayerVelY = 0;
+	}
+	//Ladder Collision
+	if(SDL_HasIntersection(&Player, &Ladder))
 	{
 		isGrounded = true;
 		Player.y -= PlayerVelY;
@@ -1177,8 +1203,10 @@ SDL_RenderCopy(r1, w10, NULL, &Wall10);
 SDL_RenderCopy(r1, w11, NULL, &Wall11);
 
 SDL_RenderCopy(r1, w12, NULL, &Wall12);
-
+//Render the Platforms
 SDL_RenderCopy(r1, p1, NULL,&Platform);
+//Render The Ladders
+SDL_RenderCopy(r1, LadderTexture,NULL,&Ladder);
 SDL_RenderPresent(r1);
 //SDL Drawing Process End//
 SDL_Delay(16);
