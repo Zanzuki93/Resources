@@ -435,7 +435,6 @@ DiscipleVision.x = Disciple.x - 75;
 DiscipleVision.y = Disciple.y;
 DiscipleVision.w = 200;
 DiscipleVision.h = 100;
-SDL_Texture * DiscipleVisionTexture = IMG_LoadTexture(r1,(images_dir + "testimage.png").c_str());
 //Creating Enemy Bullet
 EnemyBullet tempBullet = EnemyBullet((images_dir + "EnemyBulletTextureRight.png").c_str(),r1);
 BulletList.push_back(tempBullet);
@@ -634,6 +633,17 @@ while(inGame)
 			BulletList[eb].BulletDir = 1;
 		}
 	}
+	//Update Moving Enemy
+	if (Player.x < Disciple.x)
+	{
+		DiscipleTexture = IMG_LoadTexture(r1, (images_dir + "DiscipleLeft.png").c_str());
+	}
+	if (Player.x > Disciple.x)
+	{
+		DiscipleTexture = IMG_LoadTexture(r1, (images_dir + "DiscipleRight.png").c_str());
+	}
+	
+
 
 	//Update Player//
 	//Adjusting the screen Horizontally
@@ -765,13 +775,11 @@ while(inGame)
 		{
 		Disciple.x +=2;
 		DiscipleVision.x = Disciple.x -75;
-		DiscipleTexture = IMG_LoadTexture(r1,(images_dir + "DiscipleRight.png").c_str());
 		}
 		if(Player.x < Disciple.x)
 		{
 		Disciple.x -= 2;
 		DiscipleVision.x = Disciple.x-75;
-		DiscipleTexture = IMG_LoadTexture(r1,(images_dir + "DiscipleLeft.png").c_str());
 		}
 	}
 	if(SDL_HasIntersection(&Player,&Disciple))
@@ -794,8 +802,8 @@ while(inGame)
 				discipleDead = true;
 				Disciple.x =-1000;
 				Disciple.y = -3000;
-				DiscipleVision.x -1000;
-				DiscipleVision.y -3000;
+				DiscipleVision.x = -1000;
+				DiscipleVision.y = -3000;
 				ListofAmmo[pb].PBullet.x = 2000;
 				ListofAmmo[pb].PBullet.y = 2000;
 				ListofAmmo[pb].isActive = false;
@@ -1102,7 +1110,6 @@ SDL_RenderCopy(r1, ManaPot, NULL, &ManaPotion);
 //Rendering the enemy texture
 SDL_RenderCopy(r1, EnemyTexture, NULL, &Enemy);
 SDL_RenderCopy(r1,TurretTexture,NULL,&Turret);
-//SDL_RenderCopy(r1,DiscipleVisionTexture,NULL,&DiscipleVision);
 SDL_RenderCopy(r1,DiscipleTexture,NULL,&Disciple);
 //Rendering the Enemy Bullet
 //EnemyBullets
