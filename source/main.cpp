@@ -311,7 +311,57 @@ Ladder.x = 700;
 Ladder.y = 660;
 Ladder.w = 100;
 Ladder.h = 330;
-SDL_Texture * LadderTexture = IMG_LoadTexture(r1,(images_dir + "LadderTexture.png").c_str());
+SDL_Texture * l1 = IMG_LoadTexture(r1,(images_dir + "LadderTexture.png").c_str());
+SDL_Rect Ladder2;
+Ladder2.x = 525;
+Ladder2.y = -200;
+Ladder2.w = 90;
+Ladder2.h = 230;
+SDL_Texture *l2 = IMG_LoadTexture(r1, (images_dir + "LadderTexture.png").c_str());
+SDL_Rect Ladder3;
+Ladder3.x = 500;
+Ladder3.y = -800;
+Ladder3.w = 160;
+Ladder3.h = 265;
+SDL_Texture *l3 = IMG_LoadTexture(r1, (images_dir + "LadderTexture.png").c_str());
+SDL_Rect Ladder4;
+Ladder4.x = 30;
+Ladder4.y = -800;
+Ladder4.w = 150;
+Ladder4.h = 175;
+SDL_Texture *l4 = IMG_LoadTexture(r1, (images_dir + "LadderTexture.png").c_str());
+SDL_Rect Ladder5;
+Ladder5.x = 10;
+Ladder5.y = 325;
+Ladder5.w = 120;
+Ladder5.h = 350;
+SDL_Texture *l5 = IMG_LoadTexture(r1, (images_dir + "LadderTexture.png").c_str());
+//End of Creating Ladders ^^^
+//Creating more stuff
+SDL_Rect Table;
+Table.x = 30;
+Table.y = 50;
+Table.w = 75;
+Table.h = 75;
+SDL_Texture * TableTexture = IMG_LoadTexture(r1, (images_dir + "TableWithBook.png").c_str());
+SDL_Rect BookCase;
+BookCase.x = 180;
+BookCase.y = -70;
+BookCase.w = 75;
+BookCase.h = 100;
+SDL_Texture * BookCaseTexture = IMG_LoadTexture(r1, (images_dir + "BookCaseTexture.png").c_str());
+SDL_Rect Staff;
+Staff.x = 10;
+Staff.y = 90;
+Staff.w = 32;
+Staff.h = 32;
+SDL_Texture * StaffTexture = IMG_LoadTexture(r1, (images_dir + "StaffTexture.png").c_str());
+SDL_Rect Shield;
+Shield.x = 300;
+Shield.y = 500;
+Shield.w = 50;
+Shield.h = 50;
+SDL_Texture * ShieldTexture = IMG_LoadTexture(r1, (images_dir + "ShieldTexture.png").c_str());
 //Creating a pickup
 SDL_Rect healthPickUp;
 healthPickUp.x = 700;
@@ -688,6 +738,14 @@ while(inGame)
 			tempBullet.EnemBullet.x -= PlayerVelX;
 			Platform.x -= PlayerVelX;
 			Ladder.x -= PlayerVelX;
+			Ladder2.x -= PlayerVelX;
+			Ladder3.x -= PlayerVelX;
+			Ladder4.x -= PlayerVelX;
+			Ladder5.x -= PlayerVelX;
+			Table.x -= PlayerVelX;
+			BookCase.x -= PlayerVelX;
+			Staff.x -= PlayerVelX;
+			Shield.x -= PlayerVelX;
 		}
 	if(Player.x < 0 + (Player.w * 2))
 			{
@@ -719,6 +777,14 @@ while(inGame)
 				tempBullet.EnemBullet.x -= PlayerVelX;
 				Platform.x -= PlayerVelX;
 				Ladder.x -= PlayerVelX;
+				Ladder2.x -= PlayerVelX;
+				Ladder3.x -= PlayerVelX;
+				Ladder4.x -= PlayerVelX;
+				Ladder5.x -= PlayerVelX;
+				Table.x -= PlayerVelX;
+				BookCase.x -= PlayerVelX;
+				Staff.x -= PlayerVelX;
+				Shield.x -= PlayerVelX;
 			}
 	//Checking For collision with walls and the player Left and Right
 	if (SDL_HasIntersection(&Player, &Wall) || SDL_HasIntersection(&Player, &Wall2) ||
@@ -925,6 +991,14 @@ while(inGame)
 					tempBullet.EnemBullet.y -= PlayerVelY;
 					Platform.y -= PlayerVelY;
 					Ladder.y -= PlayerVelY;
+					Ladder2.y -= PlayerVelY;
+					Ladder3.y -= PlayerVelY;
+					Ladder4.y -= PlayerVelY;
+					Ladder5.y -= PlayerVelY;
+					Table.y -= PlayerVelY;
+					BookCase.y -= PlayerVelY;
+					Staff.y -= PlayerVelY;
+					Shield.y -= PlayerVelY;
 				}
 				//checking to see if while falling the player reaches the edge of the screen
 				if(Player.y > 768 - (Player.h*2))
@@ -957,6 +1031,14 @@ while(inGame)
 					tempBullet.EnemBullet.y -= PlayerVelY;
 					Platform.y -= PlayerVelY;
 					Ladder.y -= PlayerVelY;
+					Ladder2.y -= PlayerVelY;
+					Ladder3.y -= PlayerVelY;
+					Ladder4.y -= PlayerVelY;
+					Ladder5.y -= PlayerVelY;
+					Table.y -= PlayerVelY;
+					BookCase.y -= PlayerVelY;
+					Staff.y -= PlayerVelY;
+					Shield.y -= PlayerVelY;
 				}
 					if(PlayerVelY >= 5)
 					{
@@ -999,6 +1081,14 @@ while(inGame)
 			tempBullet.EnemBullet.y -= PlayerVelY;
 			Platform.y -= PlayerVelY;
 			Ladder.y -= PlayerVelY;
+			Ladder2.y -= PlayerVelY;
+			Ladder3.y -= PlayerVelY;
+			Ladder4.y -= PlayerVelY;
+			Ladder5.y -= PlayerVelY;
+			Table.y -= PlayerVelY;
+			BookCase.y -= PlayerVelY;
+			Staff.y -= PlayerVelY;
+			Shield.y -= PlayerVelY;
 		}
 
 		if(Player.y > 768 - (Player.h * 2))
@@ -1031,6 +1121,14 @@ while(inGame)
 			tempBullet.EnemBullet.y -= PlayerVelY;
 			Platform.y -= PlayerVelY;
 			Ladder.y -= PlayerVelY;
+			Ladder2.y -= PlayerVelY;
+			Ladder3.y -= PlayerVelY;
+			Ladder4.y -= PlayerVelY;
+			Ladder5.y -= PlayerVelY;
+			Table.y -= PlayerVelY;
+			BookCase.y -= PlayerVelY;
+			Staff.y -= PlayerVelY;
+			Shield.y -= PlayerVelY;
 		}
 	}
 
@@ -1206,7 +1304,16 @@ SDL_RenderCopy(r1, w12, NULL, &Wall12);
 //Render the Platforms
 SDL_RenderCopy(r1, p1, NULL,&Platform);
 //Render The Ladders
-SDL_RenderCopy(r1, LadderTexture,NULL,&Ladder);
+SDL_RenderCopy(r1, l1,NULL,&Ladder);
+SDL_RenderCopy(r1, l2,NULL,&Ladder2);
+SDL_RenderCopy(r1, l3,NULL,&Ladder3);
+SDL_RenderCopy(r1, l4,NULL,&Ladder4);
+SDL_RenderCopy(r1, l5,NULL,&Ladder5);
+//Rendering Miscellaneous stuff
+SDL_RenderCopy(r1,TableTexture,NULL,&Table);
+SDL_RenderCopy(r1,BookCaseTexture,NULL,&BookCase);
+SDL_RenderCopy(r1,StaffTexture,NULL,&Staff);
+SDL_RenderCopy(r1,ShieldTexture,NULL,&Shield);
 SDL_RenderPresent(r1);
 //SDL Drawing Process End//
 SDL_Delay(16);
